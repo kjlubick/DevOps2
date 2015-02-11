@@ -5,6 +5,12 @@ var fs = require("fs");
 faker.locale = "en";
 var mock = require('mock-fs');
 
+var mockDir = "testPath";
+var mockFile = "testFile";
+var dirDoesNotExist = "doesnotexist";
+var fileDoesNotExist = "stillDoesNotExist";
+var mockEmptyFile = "emptyFile";
+
 function main()
 {
 	var args = process.argv.slice(2);
@@ -29,22 +35,6 @@ function fakeDemo()
 	console.log( faker.phone.phoneFormats() );
 }
 
-function fileDemo()
-{
-	mock(
-	{
-		path: 
-		{	
-  			file1: 'text content',
-		}
-	});
-
-
-
-	mock.restore();
-}
-fileDemo();
-
 var functionConstraints =
 {
 }
@@ -52,7 +42,18 @@ var functionConstraints =
 function generateTestCases()
 {
 
-	var content = "var subject = require('./subject.js')\n";
+	var content = "var subject = require('./subject.js');\n";
+
+	var mockOptions = {testPath:{testFile:'text content', emptyFile:''}};
+
+
+	content += "var mock = require('mock-fs');mock(" + JSON.stringify(mockOptions)+");\n";
+	content += "var testPath = 'testPath';";
+	content += "var testFile ='testFile';";
+	content += "var doesnotexist = 'doesnotexist';";
+	content += "var stillDoesNotExist = 'stillDoesNotExist';";
+	content += "var emptyFile = 'emptyFile';\n";
+
 	for ( var funcName in functionConstraints )
 	{
 		var params = {};
@@ -62,18 +63,22 @@ function generateTestCases()
 		{
 			var paramName = functionConstraints[funcName].params[i];
 			//params[paramName] = '\'' + faker.phone.phoneNumber()+'\'';
-			params[paramName] = '\'\'';
+			params[paramName] = "''";
 		}
 
+		console.log("params:");
 		console.log( params );
 
 		// update parameter values based on known constraints.
+
+
 		for( var c = 0; c < functionConstraints[funcName].constraints.length; c++ )
 		{
 			var constraint = functionConstraints[funcName].constraints[c];
 
 			if( params.hasOwnProperty( constraint.ident ) )
 			{
+
 				params[constraint.ident] = constraint.value;
 			}
 		}
@@ -86,7 +91,7 @@ function generateTestCases()
 
 	}
 
-
+	content += "\nmock.restore()";
 
 	fs.writeFileSync('test.js', content, "utf8");
 
@@ -104,9 +109,27 @@ function constraints(filePath)
 			var funcName = functionName(node);
 			console.log("Line : {0} Function: {1}".format(node.loc.start.line, funcName ));
 
-			var params = node.params.map(function(p) {return p.name});
+			var paramConstraints = [];
 
-			functionConstraints[funcName] = {constraints:[], params: params};
+			var params = node.params.map(function(p) {
+				if (p.name == "dir") {
+					paramConstraints.push({
+						ident: p.name,
+						value: mockDir
+					});
+				}
+				if (p.name == "filePath") {
+					paramConstraints.push({
+						ident: p.name,
+						value: mockDir + '+"/"+'+mockFile
+					});
+				}
+				return p.name;
+			});
+
+
+			functionConstraints[funcName] = {constraints:paramConstraints, params: params};
+
 
 			// Check for expressions using argument.
 			traverse(node, function(child)
@@ -117,7 +140,7 @@ function constraints(filePath)
 					{
 						// get expression from original source code:
 						//var expression = buf.substring(child.range[0], child.range[1]);
-						var rightHand = buf.substring(child.right.range[0], child.right.range[1])
+						var rightHand = buf.substring(child.right.range[0], child.right.range[1]);
 						functionConstraints[funcName].constraints.push( 
 							{
 								ident: child.left.name,

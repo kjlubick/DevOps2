@@ -18,7 +18,7 @@ function fileTest(dir, filePath)
    	return false;
 	}
 
-   if( fs.exists(filePath ))
+   if( fs.existsSync(filePath ))
    {
 		var buf = fs.readFileSync(filePath, "utf8");
 		if( buf.length > 0 )

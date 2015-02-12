@@ -35,6 +35,8 @@ function fakeDemo()
 	console.log( faker.phone.phoneFormats() );
 }
 
+fakeDemo();
+
 var functionConstraints =
 {
 }
@@ -56,23 +58,61 @@ function generateTestCases()
 
 	for ( var funcName in functionConstraints )
 	{
-		var params = {};
+		var paramList = [];
 
+		var permutes = 1;
+		var permuteCounters = [];
 		// initialize params
 		for (var i =0; i < functionConstraints[funcName].params.length; i++ )
 		{
 			var paramName = functionConstraints[funcName].params[i];
 			//params[paramName] = '\'' + faker.phone.phoneNumber()+'\'';
-			params[paramName] = "''";
+			//params[paramName] = "''";
+			paramList.push(paramName);
+			var num = functionConstraints[funcName].constraints[paramName].length;
+			permuteCounters.push({ max: num, current:0});
+			permutes *= num;
+			
 		}
+		
+		var constraints = functionConstraints[funcName].constraints;
+		console.log("constraints");
+		console.log(constraints);
 
-		console.log("params:");
-		console.log( params );
+		//console.log("params:");
+		//console.log( params );
+		console.log("Permutes: "+permutes);
 
 		// update parameter values based on known constraints.
+		outer:
+		while (true) {
+			
+			console.log(JSON.stringify(permuteCounters));
+			
+			var args = "";
+			for( var c = 0; c < permuteCounters.length; c++) {
+				if (c != 0) {
+					args+=",";
+				}
+				args += constraints[paramList[c]][permuteCounters[c].current];
+			}
+			content += "subject.{0}({1});\n".format(funcName, args );
+			
+			permuteCounters[0].current++;
+			for( var d = 0; d < permuteCounters.length; d++) {
+				if (permuteCounters[d].current >= permuteCounters[d].max) {
+					if (d == permuteCounters.length - 1) {
+						break outer;
+					}
+					permuteCounters[d].current = 0;
+					permuteCounters[d+1].current++;
+				} else {
+					break;	//go again
+				}
+			}
+		}
 
-
-		for( var c = 0; c < functionConstraints[funcName].constraints.length; c++ )
+		/*for( var c = 0; c < functionConstraints[funcName].constraints.length; c++ )
 		{
 			var constraint = functionConstraints[funcName].constraints[c];
 
@@ -88,7 +128,7 @@ function generateTestCases()
 
 		// Emit test case.
 		content += "subject.{0}({1});\n".format(funcName, args );
-
+	*/
 	}
 
 	content += "\nmock.restore()";
@@ -109,21 +149,23 @@ function constraints(filePath)
 			var funcName = functionName(node);
 			console.log("Line : {0} Function: {1}".format(node.loc.start.line, funcName ));
 
-			var paramConstraints = [];
+			var paramConstraints = {};
 
 			var params = node.params.map(function(p) {
+				var constraints = ['undefined', "''"];		//defaults for everybody
+				
+				
+				
 				if (p.name == "dir") {
-					paramConstraints.push({
-						ident: p.name,
-						value: mockDir
-					});
+					constraints.push( mockDir);
 				}
 				if (p.name == "filePath") {
-					paramConstraints.push({
-						ident: p.name,
-						value: mockDir + '+"/"+'+mockFile
-					});
+					constraints.push( mockDir + '+"/"+'+mockFile);
 				}
+				
+				
+				paramConstraints[p.name] = constraints;
+				
 				return p.name;
 			});
 
@@ -141,11 +183,13 @@ function constraints(filePath)
 						// get expression from original source code:
 						//var expression = buf.substring(child.range[0], child.range[1]);
 						var rightHand = buf.substring(child.right.range[0], child.right.range[1]);
-						functionConstraints[funcName].constraints.push( 
-							{
-								ident: child.left.name,
-								value: rightHand
-							});
+						var constraints = functionConstraints[funcName].constraints[child.left.name];
+						if (constraints.indexOf(rightHand) == -1){
+							constraints.push(rightHand);
+						}
+						
+						//todo less than, greater than, etc
+						
 					}
 				}
 			});

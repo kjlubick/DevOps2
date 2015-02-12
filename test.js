@@ -1,10 +1,30 @@
 var subject = require('./subject.js');
 var mock = require('mock-fs');mock({"testPath":{"testFile":"text content","emptyFile":""}});
 var testPath = 'testPath';var testFile ='testFile';var doesnotexist = 'doesnotexist';var stillDoesNotExist = 'stillDoesNotExist';var emptyFile = 'emptyFile';
+subject.inc(undefined,undefined);
 subject.inc('',undefined);
+subject.inc(undefined,'');
+subject.inc('','');
+subject.fileTest(undefined,undefined);
+subject.fileTest('',undefined);
+subject.fileTest(testPath,undefined);
+subject.fileTest(undefined,'');
+subject.fileTest('','');
+subject.fileTest(testPath,'');
+subject.fileTest(undefined,testPath+"/"+testFile);
+subject.fileTest('',testPath+"/"+testFile);
 subject.fileTest(testPath,testPath+"/"+testFile);
+subject.normalize(undefined);
 subject.normalize('');
+subject.format(undefined,undefined,undefined);
+subject.format('',undefined,undefined);
+subject.format(undefined,'',undefined);
+subject.format('','',undefined);
+subject.format(undefined,undefined,'');
+subject.format('',undefined,'');
+subject.format(undefined,'','');
 subject.format('','','');
+subject.blackListNumber(undefined);
 subject.blackListNumber('');
 
 mock.restore()

@@ -152,7 +152,7 @@ function constraints(filePath)
 			var paramConstraints = {};
 
 			var params = node.params.map(function(p) {
-				var constraints = ['undefined', "''"];		//defaults for everybody
+				var constraints = ["''"];		//defaults for everybody
 				
 				
 				
@@ -161,6 +161,7 @@ function constraints(filePath)
 				}
 				if (p.name == "filePath") {
 					constraints.push( mockDir + '+"/"+'+mockFile);
+					constraints.splice(constraints.indexOf("''"),1);
 				}
 				
 				

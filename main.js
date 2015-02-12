@@ -201,13 +201,16 @@ function constraints(filePath)
 				}
 				
 				if( child.type === 'BinaryExpression' && (child.operator == "<" || child.operator ==">" || child.operator == "=<" || child.operator ==">=")) {
-					var literal;
-					if (child.left.type == 'Literal') {
-						literal = parseInt(buf.substring(child.left.range[0], child.left.range[1]));
-					} else if (child.right.type == 'Literal') {
-						literal = parseInt(buf.substring(child.right.range[0], child.right.range[1]));
+					var constraints;
+					var literal = undefined;
+					if (child.left.type == 'Literal' && child.right.name && params.indexOf( child.right.name ) > -1) {
+						literal = child.left.value;
+						constraints = functionConstraints[funcName].constraints[child.right.name];
+					} else if (child.right.type == 'Literal' && child.left.name && params.indexOf( child.left.name ) > -1) {
+						literal = child.right.value;
+						constraints = functionConstraints[funcName].constraints[child.left.name];
 					}
-					if (literal) {
+					if (literal !== undefined) {
 						constraints.splice(constraints.indexOf("''"),1); //remove empty string
 						constraints.push(literal);
 						constraints.push(literal -1);

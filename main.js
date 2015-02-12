@@ -199,6 +199,21 @@ function constraints(filePath)
 						
 					}
 				}
+				
+				if( child.type === 'BinaryExpression' && (child.operator == "<" || child.operator ==">" || child.operator == "=<" || child.operator ==">=")) {
+					var literal;
+					if (child.left.type == 'Literal') {
+						literal = parseInt(buf.substring(child.left.range[0], child.left.range[1]));
+					} else if (child.right.type == 'Literal') {
+						literal = parseInt(buf.substring(child.right.range[0], child.right.range[1]));
+					}
+					if (literal) {
+						constraints.splice(constraints.indexOf("''"),1); //remove empty string
+						constraints.push(literal);
+						constraints.push(literal -1);
+						constraints.push(literal + 1);
+					}
+				}
 			});
 
 			console.log( functionConstraints[funcName]);

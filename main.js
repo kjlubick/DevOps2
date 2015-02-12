@@ -158,10 +158,16 @@ function constraints(filePath)
 				
 				if (p.name == "dir") {
 					constraints.push( mockDir);
+					constraints.push(dirDoesNotExist);
 				}
 				if (p.name == "filePath") {
+					constraints.splice(constraints.indexOf("''"),1); //remove empty
+					
 					constraints.push( mockDir + '+"/"+'+mockFile);
-					constraints.splice(constraints.indexOf("''"),1);
+					constraints.push( mockDir + '+"/"+'+mockEmptyFile);
+					constraints.push( mockDir + '+"/"+'+fileDoesNotExist);
+					constraints.push( mockDir + '+"/"+'+mockFile);
+					constraints.push( dirDoesNotExist + '+"/"+'+fileDoesNotExist);
 				}
 				
 				

@@ -169,6 +169,10 @@ function constraints(filePath)
 					constraints.push( mockDir + '+"/"+'+mockFile);
 					constraints.push( dirDoesNotExist + '+"/"+'+fileDoesNotExist);
 				}
+				if (p.name === "phoneNumber") {
+					constraints.push("'"+faker.phone.phoneNumber()+"'");
+					constraints.push("'"+faker.phone.phoneNumberFormat()+"'");
+				}
 				
 				
 				paramConstraints[p.name] = constraints;

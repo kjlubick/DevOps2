@@ -23,8 +23,16 @@ subject.fileTest('',doesnotexist+"/"+stillDoesNotExist);
 subject.fileTest(testPath,doesnotexist+"/"+stillDoesNotExist);
 subject.fileTest(doesnotexist,doesnotexist+"/"+stillDoesNotExist);
 subject.normalize('');
+subject.normalize('(172) 771-2289 x181');
+subject.normalize('321-845-5149');
 subject.format('','','');
+subject.format('1-988-002-6793','','');
+subject.format('514-765-1973','','');
 subject.format('','','foo');
+subject.format('1-988-002-6793','','foo');
+subject.format('514-765-1973','','foo');
 subject.blackListNumber('');
+subject.blackListNumber('(334) 946-9062 x77511');
+subject.blackListNumber('755-255-0778');
 
 mock.restore()

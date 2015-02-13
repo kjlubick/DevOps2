@@ -24,6 +24,7 @@ subject.fileTest(testPath,doesnotexist+"/"+stillDoesNotExist);
 subject.fileTest(doesnotexist,doesnotexist+"/"+stillDoesNotExist);
 subject.normalize('');
 subject.format('','','');
+subject.format('','','foo');
 subject.blackListNumber('');
 
 mock.restore()

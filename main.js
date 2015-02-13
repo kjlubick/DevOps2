@@ -218,8 +218,11 @@ function constraints(filePath)
 				//console.log(child.type);
 				
 				if (child.type === 'UnaryExpression' && child.operator === "!") {
-					console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					console.log(child);
+					var arg = child.argument;
+					if (arg.name && params.indexOf(arg.name) != -1) {
+						constraints = functionConstraints[funcName].constraints[arg.name];
+						constraints.push("'foo'");  //nonempty
+					}
 				}
 				
 				return true;
@@ -233,7 +236,7 @@ function constraints(filePath)
 
 function traverse(object, visitor) 
 {
-	if (object.constructor === Array) {
+	/*if (object.constructor === Array) {
 		//console.log("found array");
 		//console.log(object);
 		for(var i = 0;i<object.length;i++) {
@@ -242,7 +245,7 @@ function traverse(object, visitor)
 			}
 		}
 		return;
-	}
+	}*/
     var key, child;
 
     visitor.call(null, object);

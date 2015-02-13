@@ -226,7 +226,13 @@ function constraints(filePath)
 					if (arg.name && params.indexOf(arg.name) != -1) {
 						constraints = functionConstraints[funcName].constraints[arg.name];
 						constraints.push("'foo'");  //nonempty
+					} else if (arg.object && arg.object.name && arg.property.name && params.indexOf(arg.object.name) != -1) {
+						constraints = functionConstraints[funcName].constraints[arg.object.name];
+						var fakeObj = {};
+						fakeObj[arg.property.name] = "foo";
+						constraints.push(JSON.stringify(fakeObj));  //nonempty
 					}
+					
 				}
 				
 				return true;

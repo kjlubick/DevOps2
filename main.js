@@ -211,7 +211,7 @@ function constraints(filePath)
 						literal = child.right.value;
 						constraints = functionConstraints[funcName].constraints[child.left.name];
 					}
-					if (literal !== undefined) {
+					if (typeof literal == "number") {
 						constraints.splice(constraints.indexOf("''"),1); //remove empty string
 						constraints.push(literal);
 						constraints.push(literal -1);

@@ -194,9 +194,6 @@ function constraints(filePath)
 						if (constraints.indexOf(rightHand) == -1){
 							constraints.push(rightHand);
 						}
-						
-						//todo less than, greater than, etc
-						
 					}
 				}
 				
@@ -217,6 +214,15 @@ function constraints(filePath)
 						constraints.push(literal + 1);
 					}
 				}
+				
+				//console.log(child.type);
+				
+				if (child.type === 'UnaryExpression' && child.operator === "!") {
+					console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					console.log(child);
+				}
+				
+				return true;
 			});
 
 			console.log( functionConstraints[funcName]);
@@ -227,12 +233,23 @@ function constraints(filePath)
 
 function traverse(object, visitor) 
 {
+	if (object.constructor === Array) {
+		//console.log("found array");
+		//console.log(object);
+		for(var i = 0;i<object.length;i++) {
+			if (typeof object[i] === 'object' && object !== null) {
+				traverse(object[i], visitor);
+			}
+		}
+		return;
+	}
     var key, child;
 
     visitor.call(null, object);
     for (key in object) {
         if (object.hasOwnProperty(key)) {
             child = object[key];
+			
             if (typeof child === 'object' && child !== null) {
                 traverse(child, visitor);
             }
